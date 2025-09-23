@@ -1,0 +1,20 @@
+[project]
+name = "mysql-manager"
+version = "0.1.0"
+description = "Interactive CLI for managing Oracle MySQL Community Server on Amazon Linux 2"
+authors = ["DevOps Engineer <devops@example.com>"]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "typer[all]",
+    "rich",
+    "PyYAML",
+    "questionary"
+]
+
+[project.scripts]
+mysqlm = "mysqlm.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
