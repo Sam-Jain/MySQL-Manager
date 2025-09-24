@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
@@ -11,6 +12,15 @@ from rich.logging import RichHandler
 from . import constants
 
 _LOGGER_INITIALIZED = False
+
+
+def _fallback_log_dir() -> Path:
+    """Return a user-writable directory for mysqlm logs."""
+
+    xdg_state_home = os.environ.get("XDG_STATE_HOME")
+    if xdg_state_home:
+        return Path(xdg_state_home) / "mysqlm"
+    return Path.home() / ".mysqlm" / "log"
 
 
 def configure_logging(verbose: bool = False, log_path: Optional[Path] = None) -> logging.Logger:
@@ -32,7 +42,17 @@ def configure_logging(verbose: bool = False, log_path: Optional[Path] = None) ->
     console_handler.setLevel(logging.DEBUG if verbose else logging.INFO)
     logger.addHandler(console_handler)
 
-    log_path = log_path or (constants.DEFAULT_LOG_DIR / "mysqlm.log")
+    if log_path is None:
+        log_path = constants.DEFAULT_LOG_DIR / "mysqlm.log"
+        try:
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+        except PermissionError:
+            fallback_dir = _fallback_log_dir()
+            fallback_dir.mkdir(parents=True, exist_ok=True)
+            log_path = fallback_dir / log_path.name
+    else:
+        log_path = Path(log_path)
+
     log_path.parent.mkdir(parents=True, exist_ok=True)
     file_handler = RotatingFileHandler(log_path, maxBytes=5_000_000, backupCount=5)
     file_handler.setLevel(logging.DEBUG)
