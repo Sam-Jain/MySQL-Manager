@@ -2,7 +2,7 @@
 name = "mysql-manager"
 version = "0.1.0"
 description = "Interactive CLI for managing Oracle MySQL Community Server on Amazon Linux 2"
-authors = ["DevOps Engineer <devops@example.com>"]
+authors = [{ name = "DevOps Engineer", email = "devops@example.com" }]
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
